@@ -1,6 +1,6 @@
 # Essay Lens — MVP demo
 
-Essay Lens là giao diện tĩnh rà soát dấu hiệu văn phong theo từng đoạn. Phân tích chạy hoàn toàn trong trình duyệt bằng bộ luật local; bài làm không được gửi tới API hay lưu trên máy chủ. Có thể mở `public/index.html` qua Live Server hoặc static hosting, không cần Python.
+Essay Lens là giao diện tĩnh rà soát dấu hiệu văn phong theo từng đoạn. Trang tự điền sẵn một bài luận mẫu về trí tuệ nhân tạo trong giáo dục để thử kiểm tra; người dùng có thể thay bằng nội dung của mình. Phân tích chạy hoàn toàn trong trình duyệt bằng bộ luật local; bài làm không được gửi tới API hay lưu trên máy chủ. Có thể mở `public/index.html` qua Live Server hoặc static hosting, không cần Python.
 
 ## Chạy trên Windows
 
