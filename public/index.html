@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f6f8" />
+    <meta name="description" content="Công cụ demo hỗ trợ rà soát các tín hiệu văn phong trong bài làm học thuật." />
+    <title>Essay Lens | Rà soát bài làm</title>
+    <link rel="stylesheet" href="/public/styles.css?v=local-rules-50" />
+    <script src="/public/rule-engine.js?v=local-rules-50" defer></script>
+    <script src="/public/app.js?v=local-rules-50" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Essay Lens, trang chủ">
+        <span class="brand-mark" aria-hidden="true">E</span>
+        <span class="brand-copy"><strong>Essay <b>Lens</b></strong><small>ACADEMIC REVIEW</small></span>
+      </a>
+      <div class="topbar-right">
+        <span class="demo-badge"><i></i> BẢN DEMO</span>
+        <span class="topbar-caption">Trợ lý rà soát văn phong</span>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow"><span class="eyebrow-line"></span> KHÔNG GIAN RÀ SOÁT BÀI LÀM</p>
+          <h1>Đọc kỹ hơn.<br /><span>Đánh giá công bằng hơn.</span></h1>
+          <p class="intro">Xem các tín hiệu văn phong theo từng đoạn — như một điểm bắt đầu để trao đổi, không phải kết luận.</p>
+        </div>
+        <aside class="heading-note">
+          <span class="note-icon" aria-hidden="true">i</span>
+          <p><strong>Một công cụ tham khảo</strong><br />Văn phong không thể chứng minh ai đã viết bài.</p>
+        </aside>
+      </section>
+
+      <div class="workspace">
+        <section class="panel input-panel" aria-labelledby="input-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">01 / NỘI DUNG</p>
+              <h2 id="input-heading">Bài làm cần rà soát</h2>
+            </div>
+            <span class="optional-tag">Tối đa 10.000 ký tự</span>
+          </div>
+          <div class="sample-row" aria-label="Nạp bài mẫu">
+            <span class="sample-label">THỬ NHANH</span>
+            <button type="button" class="sample-button" id="sample-specific">Mẫu · Giọng kể cụ thể <span aria-hidden="true">↗</span></button>
+            <button type="button" class="sample-button" id="sample-structured">Mẫu · Cấu trúc đều <span aria-hidden="true">↗</span></button>
+          </div>
+          <label class="sr-only" for="essay-text">Nội dung bài làm</label>
+          <textarea id="essay-text" maxlength="10000" spellcheck="true" placeholder="Dán bài luận, báo cáo hoặc câu trả lời tự luận vào đây…&#10;&#10;Giữ một dòng trống giữa các đoạn để xem kết quả theo từng đoạn."></textarea>
+          <div class="input-footer">
+            <span id="text-count">0 từ <span class="count-separator">·</span> 0 / 10.000 ký tự</span>
+            <span class="input-hint">Khi cấu hình Groq, nội dung sẽ được gửi tới Groq để phân tích; nếu không, bài được xử lý local.</span>
+          </div>
+          <div class="form-grid">
+            <label>
+              <span>Ngôn ngữ bài làm</span>
+              <select id="language">
+                <option value="vi">Tiếng Việt</option>
+                <option value="en">English</option>
+                <option value="other">Song ngữ / Khác</option>
+              </select>
+            </label>
+            <label>
+              <span>Nhóm ngành / dạng bài</span>
+              <select id="field">
+                <option value="general">Chung / Đa ngành</option>
+                <option value="business">Kinh tế - Quản trị</option>
+                <option value="humanities">Xã hội - Nhân văn - Truyền thông</option>
+                <option value="technology">Kỹ thuật - Công nghệ</option>
+                <option value="essay">Bài luận / Báo cáo</option>
+              </select>
+            </label>
+          </div>
+          <div class="submit-row">
+            <p class="submit-note" id="analysis-mode-status" role="status" aria-live="polite"><span class="lock-icon" aria-hidden="true">◇</span> Ưu tiên Groq khi có API key; tự động dự phòng bằng 50 luật local.</p>
+            <button type="button" class="primary-button" id="analyze-button">
+              <span class="button-label">Chạy kiểm tra</span><span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+          <div id="error-message" class="error-message" role="alert" hidden></div>
+        </section>
+
+        <section class="panel results-panel" aria-labelledby="results-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">02 / NHẬN ĐỊNH THAM KHẢO</p>
+              <h2 id="results-heading">Tổng quan bài làm</h2>
+            </div>
+            <button type="button" class="export-button" id="export-button" disabled><span aria-hidden="true">↓</span> Xuất .txt</button>
+          </div>
+          <div id="result-empty" class="empty-state">
+            <div class="empty-illustration" aria-hidden="true"><span></span><i></i><b></b></div>
+            <p class="empty-title">Kết quả sẽ xuất hiện ở đây</p>
+            <p>Dán nội dung hoặc nạp bài mẫu để bắt đầu rà soát.</p>
+          </div>
+          <div id="result-content" hidden>
+            <div class="risk-overview">
+              <div class="risk-score-wrap">
+                <div id="risk-score" class="risk-score">—</div>
+                <div><span class="risk-overline">TÍN HIỆU VĂN PHONG</span><strong id="risk-level" class="risk-level">—</strong></div>
+              </div>
+              <span id="paragraph-count" class="paragraph-count">0 đoạn</span>
+            </div>
+            <p id="result-summary" class="summary-copy"></p>
+            <div class="result-meta">
+              <span id="checked-words">0 từ đã rà soát</span>
+              <span class="meta-dot"></span>
+              <span>Đánh giá theo đoạn</span>
+            </div>
+            <div class="disclaimer">
+              <span class="disclaimer-mark" aria-hidden="true">!</span>
+              <p id="disclaimer-text"></p>
+            </div>
+          </div>
+          <div class="demo-footnote"><span class="sparkle" aria-hidden="true">✳</span> 50 luật văn phong · không kết luận bài dùng AI</div>
+        </section>
+      </div>
+
+      <section class="panel paragraphs-panel" aria-labelledby="paragraphs-heading">
+        <div class="panel-heading paragraphs-heading">
+          <div>
+            <p class="section-kicker">03 / ĐỌC THEO ĐOẠN</p>
+            <h2 id="paragraphs-heading">Các đoạn văn</h2>
+          </div>
+          <div class="filter-group" role="group" aria-label="Lọc đoạn văn">
+            <button type="button" class="filter-button active" data-filter="all" aria-pressed="true">Tất cả đoạn</button>
+            <button type="button" class="filter-button" data-filter="flagged" aria-pressed="false">Cần chú ý</button>
+          </div>
+        </div>
+        <div id="paragraphs-empty" class="paragraphs-empty">Hoàn tất kiểm tra để xem nhận định chi tiết theo từng đoạn.</div>
+        <div id="paragraph-layout" class="paragraph-layout" hidden>
+          <div id="paragraph-list" class="paragraph-list" aria-label="Danh sách đoạn văn đã phân tích"></div>
+          <aside id="paragraph-detail" class="paragraph-detail" aria-live="polite"></aside>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>ESSAY LENS <i>·</i> MVP DEMO</span>
+        <span>Không dùng kết quả tự động làm căn cứ kỷ luật hoặc đánh giá học thuật.</span>
+      </footer>
+    </main>
+  </body>
+</html>
