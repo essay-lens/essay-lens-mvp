@@ -6,13 +6,13 @@
     <meta name="theme-color" content="#f4f6f8" />
     <meta name="description" content="Công cụ demo hỗ trợ rà soát các tín hiệu văn phong trong bài làm học thuật." />
     <title>Essay Lens | Rà soát bài làm</title>
-    <link rel="stylesheet" href="/public/styles.css?v=local-rules-50" />
-    <script src="/public/rule-engine.js?v=local-rules-50" defer></script>
-    <script src="/public/app.js?v=local-rules-50" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=local-static-1" />
+    <script src="./rule-engine.js?v=local-static-1" defer></script>
+    <script src="./app.js?v=local-static-1" defer></script>
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Essay Lens, trang chủ">
+      <a class="brand" href="./" aria-label="Essay Lens, trang chủ">
         <span class="brand-mark" aria-hidden="true">E</span>
         <span class="brand-copy"><strong>Essay <b>Lens</b></strong><small>ACADEMIC REVIEW</small></span>
       </a>
@@ -53,7 +53,7 @@
           <textarea id="essay-text" maxlength="10000" spellcheck="true" placeholder="Dán bài luận, báo cáo hoặc câu trả lời tự luận vào đây…&#10;&#10;Giữ một dòng trống giữa các đoạn để xem kết quả theo từng đoạn."></textarea>
           <div class="input-footer">
             <span id="text-count">0 từ <span class="count-separator">·</span> 0 / 10.000 ký tự</span>
-            <span class="input-hint">Khi cấu hình Groq, nội dung sẽ được gửi tới Groq để phân tích; nếu không, bài được xử lý local.</span>
+            <span class="input-hint">Bài làm được phân tích hoàn toàn trên trình duyệt; nội dung không gửi tới máy chủ.</span>
           </div>
           <div class="form-grid">
             <label>
@@ -76,7 +76,7 @@
             </label>
           </div>
           <div class="submit-row">
-            <p class="submit-note" id="analysis-mode-status" role="status" aria-live="polite"><span class="lock-icon" aria-hidden="true">◇</span> Ưu tiên Groq khi có API key; tự động dự phòng bằng 50 luật local.</p>
+            <p class="submit-note" id="analysis-mode-status" role="status" aria-live="polite"><span class="lock-icon" aria-hidden="true">◇</span> Phân tích local trên trình duyệt · 50 luật tham khảo.</p>
             <button type="button" class="primary-button" id="analyze-button">
               <span class="button-label">Chạy kiểm tra</span><span class="button-arrow" aria-hidden="true">→</span>
             </button>

@@ -180,7 +180,7 @@ function renderResult(result, wordCount) {
   renderParagraphs();
 }
 
-async function analyze() {
+function analyze() {
   clearError();
   const text = elements.text.value;
   const charCount = Array.from(text).length;
@@ -199,43 +199,12 @@ async function analyze() {
     showError(`Bản demo hỗ trợ tối đa ${MAX_PARAGRAPHS} đoạn mỗi lần rà soát.`);
     return;
   }
-  const localResult = window.EssayLensRuleEngine.analyzeText(
+  const result = window.EssayLensRuleEngine.analyzeText(
     text,
     elements.language.value,
     elements.field.value
   );
-  const fallback = {
-    ...localResult,
-    paragraphs: localResult.paragraphs.map((paragraph, index) => ({ ...paragraph, index }))
-  };
-  let result;
-  elements.analyze.disabled = true;
-  elements.modeStatus.textContent = "Đang phân tích…";
-  try {
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        language: elements.language.value,
-        field: elements.field.value,
-        fallback
-      })
-    });
-    if (!response.ok) throw new Error(`Analysis endpoint returned ${response.status}.`);
-    result = await response.json();
-    if (!Array.isArray(result.paragraphs) || result.paragraphs.length !== paragraphs.length) {
-      throw new Error("Analysis endpoint returned an invalid result.");
-    }
-    elements.modeStatus.textContent = result.engine === "groq-ai"
-      ? "Đã phân tích bằng AI (Groq)"
-      : "Chế độ dự phòng quy tắc văn phong";
-  } catch {
-    result = { ...fallback, engine: "rule-fallback" };
-    elements.modeStatus.textContent = "Chế độ dự phòng quy tắc văn phong (API không khả dụng)";
-  } finally {
-    elements.analyze.disabled = false;
-  }
+  elements.modeStatus.textContent = "Đã phân tích trên trình duyệt bằng bộ luật văn phong.";
   renderResult(result, getWordCount(text));
 }
 
