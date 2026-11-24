@@ -53,7 +53,7 @@
     humanities: ["luận điểm", "diễn ngôn", "ẩn dụ", "tư liệu", "bối cảnh lịch sử", "phương pháp định tính", "thesis", "discourse", "metaphor", "source material", "historical context", "qualitative method"],
     technology: ["thuật toán", "API", "cơ sở dữ liệu", "độ phức tạp", "kiến trúc", "mô hình hồi quy", "giao thức", "algorithm", "database", "complexity", "architecture", "regression model", "protocol"]
   };
-  const DISCLAIMER = "Đây là heuristic demo, không phải xác suất sử dụng AI hay kết luận về tác giả. Các dấu hiệu này có thể xuất hiện trong bài do con người viết; không dùng kết quả làm bằng chứng hoặc căn cứ kỷ luật.";
+  const DISCLAIMER = "Đây là sản phẩm thử nghiệm; kết quả chỉ mang tính minh họa, không phải xác suất sử dụng AI hay kết luận về tác giả. Các dấu hiệu này cũng có thể xuất hiện trong bài do con người viết. Không dùng kết quả làm căn cứ đánh giá văn bản, học thuật hoặc kỷ luật.";
 
   function phraseCount(text, phrases) {
     let total = 0;
@@ -132,18 +132,18 @@
     };
 
     const macroOpeners = ["trong bối cảnh hiện nay", "trong thời đại số", "trong kỷ nguyên", "ngày nay, khi", "in today's world", "in the modern era", "in an increasingly digital world", "nowadays, when"];
-    add("R01", 1, 8, "Mở đầu bằng cụm từ bối cảnh mang tính khuôn mẫu chung.", startsWithAny(firstSentence, macroOpeners));
+    add("R01", 1, 10, "Mở đầu bằng cụm từ bối cảnh mang tính khuôn mẫu chung.", startsWithAny(firstSentence, macroOpeners));
 
-    add("R02", 1, 9, "Mật độ từ nối chuyển ý bổ sung cao trong cùng đoạn.", phraseCount(lower, TRANSITION_PHRASES) >= 2);
+    add("R02", 1, 12, "Mật độ từ nối chuyển ý bổ sung cao trong cùng đoạn.", phraseCount(lower, TRANSITION_PHRASES) >= 2);
 
     add("R03", 1, 6, "Sử dụng cụm từ dẫn dắt mang tính khẳng định chung chung.", hasAny(lower, [
       "có thể thấy rằng", "không thể phủ nhận rằng", "rõ ràng là", "điều này cho thấy",
       "it is important to note that", "it is clear that", "it is undeniable that"
     ]));
 
-    add("R04", 1, 7, "Câu kết đoạn theo mẫu tổng kết khái quát quen thuộc.", startsWithAny(lastSentence, CONNECTOR_ENDINGS));
+    add("R04", 1, 9, "Câu kết đoạn theo mẫu tổng kết khái quát quen thuộc.", startsWithAny(lastSentence, CONNECTOR_ENDINGS));
 
-    add("R05", 1, 7, "Lạm dụng cấu trúc câu song song đối xứng.", /(?:không chỉ|không những)[\s\S]{1,140}mà còn|vừa[\s\S]{1,100}vừa|not only[\s\S]{1,140}but also|both[\s\S]{1,100}and/iu.test(text));
+    add("R05", 1, 9, "Lạm dụng cấu trúc câu song song đối xứng.", /(?:không chỉ|không những)[\s\S]{1,140}mà còn|vừa[\s\S]{1,100}vừa|not only[\s\S]{1,140}but also|both[\s\S]{1,100}and/iu.test(text));
 
     add("R06", 1, 6, "Triển khai lập luận hai chiều theo mẫu đối xứng đều.", /một mặt[\s\S]{1,140}mặt khác|tuy nhiên,?\s+ở chiều ngược lại|dù[\s\S]{1,100}nhưng|on the one hand[\s\S]{1,140}on the other hand/iu.test(text));
 
@@ -169,10 +169,10 @@
       "it is worth noting that", "plays a crucial role"
     ]));
 
-    add("R13", 2, 10, "Độ dài các câu trong đoạn quá đồng đều, thiếu nhịp biến thiên.", sentenceLengths.length >= 3 && standardDeviation(sentenceLengths) < 3.5);
+    add("R13", 2, 13, "Độ dài các câu trong đoạn quá đồng đều, thiếu nhịp biến thiên.", sentenceLengths.length >= 3 && standardDeviation(sentenceLengths) < 5);
 
     const lengthRange = sentenceLengths.length ? Math.max(...sentenceLengths) - Math.min(...sentenceLengths) : Infinity;
-    add("R14", 2, 8, "Các câu có kích thước gần bằng nhau một cách bất thường.", sentenceLengths.length >= 4 && lengthRange <= 6);
+    add("R14", 2, 10, "Các câu có kích thước gần bằng nhau một cách bất thường.", sentenceLengths.length >= 4 && lengthRange <= 6);
 
     add("R15", 2, 6, "Thiếu câu ngắn dứt khoát đan xen giữa các câu giải thích dài.", words.length > 90 && sentenceLengths.every((length) => length >= 10));
 
@@ -249,9 +249,17 @@
     const colonDefinitions = sentences.filter((sentence) => /^[^:]{2,50}:\s+\S+/u.test(sentence)).length;
     add("R38", 4, 6, "Trình bày theo kiểu liệt kê định nghĩa từ điển.", colonDefinitions >= 2);
 
-    add("R39", 4, 7, "Nêu nhiều luận điểm khái quát nhưng thiếu ví dụ minh họa.", phraseCount(lower, [
-      "thứ nhất", "thứ hai", "thứ ba", "bên cạnh đó", "ngoài ra", "đồng thời", "firstly", "secondly", "additionally"
-    ]) >= 2 && !hasAny(lower, EXAMPLE_MARKERS));
+    const hasQuantitativeAnchor =
+      /(?:\b\d+(?:[.,]\d+)?\s*(?:%|phần trăm|người|đồng|USD|VNĐ|ngày|tháng|năm|giờ|km|kg|m²|cm|mm|m|people|dollars?|days?|months?|years?|hours?)\b|\b(?:19|20)\d{2}\b)/iu.test(text) &&
+      !/^\s*(?:thứ\s+(?:nhất|hai|ba|tư|\w+)|\d+[.)])(?:\s|$)/iu.test(text);
+    const argumentMarkers = phraseCount(lower, [
+      ...TRANSITION_PHRASES, "thứ nhất", "thứ hai", "thứ ba",
+      "firstly", "secondly", "thirdly", "because", "therefore"
+    ]);
+    const hasConcreteExample = hasAny(lower, [
+      ...EXAMPLE_MARKERS, "tuần trước", "hôm qua", "cuối buổi", "một lần", "for example", "for instance"
+    ]);
+    add("R39", 4, 9, "Nêu các luận điểm khái quát nhưng thiếu ví dụ hoặc số liệu cụ thể.", words.length >= 45 && sentences.length >= 2 && argumentMarkers >= 1 && !hasConcreteExample && !hasQuantitativeAnchor);
 
     const longWords = words.filter((word) => word.length >= 7).length;
     add("R40", 4, 5, "Mật độ từ ghép trang trọng dày đặc và đồng đều.", words.length >= 30 && longWords / words.length > 0.35);
@@ -260,16 +268,13 @@
 
     add("R42", 4, 7, "Cách mở đầu giữa các đoạn lặp lại theo cùng một khuôn.", globalSignals.repeatedParagraphTransitions);
 
-    const quantitativeSignal =
-      /(?:\b\d+(?:[.,]\d+)?\s*(?:%|phần trăm|người|đồng|USD|VNĐ|ngày|tháng|năm|giờ|km|kg|m²|cm|mm|m|people|dollars?|days?|months?|years?|hours?)\b|\b(?:19|20)\d{2}\b)/iu.test(text) &&
-      !/^\s*(?:thứ\s+(?:nhất|hai|ba|tư|\w+)|\d+[.)])(?:\s|$)/iu.test(text);
-    add("R43", 5, 10, "Có dữ liệu định lượng hoặc mốc thời gian cụ thể neo vào lập luận.", quantitativeSignal);
+    add("R43", 5, 12, "Có dữ liệu định lượng hoặc mốc thời gian cụ thể neo vào lập luận.", hasQuantitativeAnchor);
 
     const namedEvidence =
       /(?:theo\s+(?:báo cáo|nghiên cứu|tác giả|mô hình|luật|nghị định|tổ chức)\b|(?:luật|nghị định|nghị quyết)\s+(?:số\s+)?[\p{N}\p{L}]+|(?:tác giả|nguồn|tài liệu tham khảo|tham khảo)\s*[:(]|\b(?:WHO|UNESCO|World Bank|OECD|CIA|FPT|VNG|NASA|Google|Microsoft)\b|[A-ZÀ-Ỹ][\p{L}\p{N}-]*(?:\s+[A-ZÀ-Ỹ][\p{L}\p{N}-]*){1,3}\s*\(\d{4}\))/iu.test(text);
     add("R44", 5, 9, "Có tên thực thể, tài liệu hoặc nguồn tham khảo cụ thể.", namedEvidence);
 
-    add("R45", 5, 8, "Có ví dụ tình huống cụ thể giúp làm rõ luận điểm.", hasAny(lower, [
+    add("R45", 5, 9, "Có ví dụ tình huống cụ thể giúp làm rõ luận điểm.", hasAny(lower, [
       "ví dụ như", "chẳng hạn tại", "trong trường hợp", "trường hợp cụ thể", "một lần",
       "tuần trước", "hôm qua", "cuối buổi", "for example", "for instance"
     ]));
@@ -346,7 +351,7 @@
     const globalSignals = { uniformParagraphLengths, repeatedParagraphTransitions };
     const context = { language, field };
     const results = paragraphs.map((paragraph, index) =>
-      analyzeParagraph(paragraph, index + 1, context, globalSignals)
+      analyzeParagraph(paragraph, index, context, globalSignals)
     );
     const overallScore = results.length
       ? Math.round(results.reduce((sum, item) => sum + item.suspicion_score, 0) / results.length)

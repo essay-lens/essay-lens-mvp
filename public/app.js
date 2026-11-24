@@ -1,6 +1,7 @@
 const MAX_CHARACTERS = 10_000;
 const MAX_PARAGRAPHS = 60;
 const samples = {
+  ai: "Trong bối cảnh hiện nay, giáo dục đóng vai trò then chốt trong việc phát triển toàn diện mỗi cá nhân. Bên cạnh đó, việc ứng dụng công nghệ mang lại nhiều lợi ích thiết thực và góp phần nâng cao chất lượng học tập. Hơn thế nữa, phương pháp này không chỉ giúp người học tiếp cận kiến thức hiệu quả mà còn tạo nền tảng vững chắc cho sự phát triển bền vững. Nhìn chung, đây là một giải pháp quan trọng, mở ra nhiều cơ hội mới trong thời đại số.",
   specific: [
     "Tuần trước, nhóm em thử bán bánh mì vào giờ tan học ở cổng ký túc xá. Đến gần 5 giờ, trời đổ mưa nên khách đứng nép dưới mái hiên; tụi em phải chuyển bàn vào trong và gói từng ổ bánh bằng túi giấy để khỏi ướt. Cuối buổi còn dư khá nhiều rau, thành ra hôm sau nhóm đổi sang chuẩn bị ít hơn.",
     "Điều em không ngờ là nhiều bạn hỏi có thể quét mã để trả tiền không. Ban đầu nhóm chỉ chuẩn bị tiền mặt, nên có vài người bỏ đi khi phải chờ tìm tiền lẻ. Từ trải nghiệm đó, nhóm thêm mã QR và ghi lại số lượng bán theo từng khung giờ, thay vì chỉ dựa vào cảm giác."
@@ -180,7 +181,7 @@ function renderResult(result, wordCount) {
   renderParagraphs();
 }
 
-async function analyze() {
+function analyze() {
   clearError();
   const text = elements.text.value;
   const charCount = Array.from(text).length;
@@ -199,43 +200,12 @@ async function analyze() {
     showError(`Bản demo hỗ trợ tối đa ${MAX_PARAGRAPHS} đoạn mỗi lần rà soát.`);
     return;
   }
-  const localResult = window.EssayLensRuleEngine.analyzeText(
+  const result = window.EssayLensRuleEngine.analyzeText(
     text,
     elements.language.value,
     elements.field.value
   );
-  const fallback = {
-    ...localResult,
-    paragraphs: localResult.paragraphs.map((paragraph, index) => ({ ...paragraph, index }))
-  };
-  let result;
-  elements.analyze.disabled = true;
-  elements.modeStatus.textContent = "Đang phân tích…";
-  try {
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        language: elements.language.value,
-        field: elements.field.value,
-        fallback
-      })
-    });
-    if (!response.ok) throw new Error(`Analysis endpoint returned ${response.status}.`);
-    result = await response.json();
-    if (!Array.isArray(result.paragraphs) || result.paragraphs.length !== paragraphs.length) {
-      throw new Error("Analysis endpoint returned an invalid result.");
-    }
-    elements.modeStatus.textContent = result.engine === "groq-ai"
-      ? "Đã phân tích bằng AI (Groq)"
-      : "Chế độ dự phòng quy tắc văn phong";
-  } catch {
-    result = { ...fallback, engine: "rule-fallback" };
-    elements.modeStatus.textContent = "Chế độ dự phòng quy tắc văn phong (API không khả dụng)";
-  } finally {
-    elements.analyze.disabled = false;
-  }
+  elements.modeStatus.textContent = "Đã phân tích trên trình duyệt bằng bộ luật văn phong.";
   renderResult(result, getWordCount(text));
 }
 
@@ -271,6 +241,13 @@ function exportReport() {
 
 elements.text.addEventListener("input", updateCounter);
 elements.analyze.addEventListener("click", analyze);
+document.querySelector("#sample-ai-style").addEventListener("click", () => {
+  elements.text.value = samples.ai;
+  elements.language.value = "vi";
+  updateCounter();
+  clearError();
+  elements.text.focus();
+});
 document.querySelector("#sample-specific").addEventListener("click", () => {
   elements.text.value = samples.specific;
   elements.language.value = "vi";
@@ -297,4 +274,5 @@ document.querySelectorAll(".filter-button").forEach((button) => {
   });
 });
 elements.export.addEventListener("click", exportReport);
+elements.text.value = samples.ai;
 updateCounter();

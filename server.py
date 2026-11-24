@@ -208,8 +208,11 @@ class DemoStaticHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
     def translate_path(self, path):
-        if urlsplit(path).path == "/":
+        requested_path = urlsplit(path).path
+        if requested_path == "/":
             return str(PUBLIC_DIR / "index.html")
+        if requested_path in {"/styles.css", "/app.js", "/rule-engine.js"}:
+            return str(PUBLIC_DIR / requested_path.lstrip("/"))
         return super().translate_path(path)
 
     def do_GET(self):
